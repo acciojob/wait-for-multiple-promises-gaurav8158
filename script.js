@@ -1,93 +1,25 @@
 //your JS code here. If required.
-// Select the table element
-const table = document.querySelector('table');
+const tableBody = document.getElementById('output');
 
-// Add a loading row
-const loadingRow = table.insertRow();
-const loadingCell = loadingRow.insertCell();
-loadingCell.colSpan = 2;
-loadingCell.textContent = 'Loading...';
+// Add a loading row to the table
+tableBody.innerHTML = `<tr><td colspan="2">Loading...</td></tr>`;
 
-// Create an array of three Promises
-const promises = [];
-for (let i = 1; i <= 3; i++) {
-  const promise = new Promise((resolve) => {
-    const randomTime = Math.floor(Math.random() * 3000) + 1000;
-    setTimeout(() => {
-      resolve(randomTime / 1000);
-    }, randomTime);
-  });
-  promises.push(promise);
-}
+// Fetch the data from the server
+fetch('https://myserver.com/data')
+  .then(response => response.json())
+  .then(data => {
+    // Remove the loading row from the table
+    tableBody.innerHTML = '';
 
-// Wait for all promises to resolve
-Promise.all(promises)
-  .then((results) => {
-    // Remove the loading row
-    table.deleteRow(loadingRow.rowIndex);
-
-    // Add the results rows
-    for (let i = 0; i < results.length; i++) {
-      const row = table.insertRow();
-      const nameCell = row.insertCell();
-      const timeCell = row.insertCell();
-      nameCell.textContent = `Promise ${i + 1}`;
-      timeCell.textContent = `${results[i]}`;
-    }
-
-    // Add the total row
-    const totalRow = table.insertRow();
-    const totalNameCell = totalRow.insertCell();
-    const totalTimeCell = totalRow.insertCell();
-    totalNameCell.textContent = 'Total';
-    totalTimeCell.textContent = `${results.reduce((acc, val) => acc + val, 0)}`;
+    // Loop through the data and populate the table rows
+    data.forEach(item => {
+      const row = document.createElement('tr');
+      row.innerHTML = `<td>${item.promiseName}</td><td>${item.timeTaken}</td>`;
+      tableBody.appendChild(row);
+    });
   })
-  .catch((error) => {
+  .catch(error => {
     console.error(error);
-  });
-     // Select the table element
-const table = document.querySelector('table');
-
-// Add a loading row
-const loadingRow = table.insertRow();
-const loadingCell = loadingRow.insertCell();
-loadingCell.colSpan = 2;
-loadingCell.textContent = 'Loading...';
-
-// Create an array of three Promises
-const promises = [];
-for (let i = 1; i <= 3; i++) {
-  const promise = new Promise((resolve) => {
-    const randomTime = Math.floor(Math.random() * 3000) + 1000;
-    setTimeout(() => {
-      resolve(randomTime / 1000);
-    }, randomTime);
-  });
-  promises.push(promise);
-}
-
-// Wait for all promises to resolve
-Promise.all(promises)
-  .then((results) => {
-    // Remove the loading row
-    table.deleteRow(loadingRow.rowIndex);
-
-    // Add the results rows
-    for (let i = 0; i < results.length; i++) {
-      const row = table.insertRow();
-      const nameCell = row.insertCell();
-      const timeCell = row.insertCell();
-      nameCell.textContent = `Promise ${i + 1}`;
-      timeCell.textContent = `${results[i]}`;
-    }
-
-    // Add the total row
-    const totalRow = table.insertRow();
-    const totalNameCell = totalRow.insertCell();
-    const totalTimeCell = totalRow.insertCell();
-    totalNameCell.textContent = 'Total';
-    totalTimeCell.textContent = `${results.reduce((acc, val) => acc + val, 0)}`;
-  })
-  .catch((error) => {
-    console.error(error);
+    // Display an error message in the table
+    tableBody.innerHTML = `<tr><td colspan="2">An error occurred while fetching the data</td></tr>`;
   });
