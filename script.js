@@ -1,25 +1,38 @@
-//your JS code here. If required.
-const tableBody = document.getElementById('output');
+const promise1 =  new Promise((resolve,reject)=>{
+	setTimeout(()=>{
+		resolve(Math.floor(Math.random()*3 + 1));
+	},Math.floor(Math.random()*3 + 1));
+});
 
-// Add a loading row to the table
-tableBody.innerHTML = `<tr><td colspan="2">Loading...</td></tr>`;
+const promise2 = new Promise((resolve,reject)=>{
+	setTimeout(()=>{
+		resolve(Math.floor(Math.random()*3 + 1));
+	},Math.floor(Math.random()*3 + 1));
+});
 
-// Fetch the data from the server
-fetch('https://myserver.com/data')
-  .then(response => response.json())
-  .then(data => {
-    // Remove the loading row from the table
-    tableBody.innerHTML = '';
+const promise3 = new Promise((resolve,reject)=>{
+	setTimeout(()=>{
+		resolve(Math.floor(Math.random()*3 + 1));
+	},Math.floor(Math.random()*3 + 1));
+});
 
-    // Loop through the data and populate the table rows
-    data.forEach(item => {
-      const row = document.createElement('tr');
-      row.innerHTML = `<td>${item.promiseName}</td><td>${item.timeTaken}</td>`;
-      tableBody.appendChild(row);
-    });
-  })
-  .catch(error => {
-    console.error(error);
-    // Display an error message in the table
-    tableBody.innerHTML = `<tr><td colspan="2">An error occurred while fetching the data</td></tr>`;
-  });
+let promises = [promise1,promise2,promise3];
+
+Promise.all(promises).then((result)=>{
+	const row1 = document.getElementById("row1");
+	row1.children[1].textContent = result[0];
+
+	const row2 = document.getElementById("row2");
+	row2.children[1].textContent = result[1];
+
+	const row3 = document.getElementById("row3");
+	row3.children[1].textContent = result[2];
+
+	const totalRow = document.querySelector("tbody tr:last-child");
+	const totalTime = result.reduce((acc,curr)=> acc + curr,0);
+	totalRow.children[1].textContent = totalTime;
+
+	const loadingRow = document.querySelector("#loading");
+    loadingRow.remove();
+	
+})
