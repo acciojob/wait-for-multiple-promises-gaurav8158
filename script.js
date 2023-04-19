@@ -1,25 +1,54 @@
-//your JS code here. If required.
-const tableBody = document.getElementById('output');
+const res = document.getElementById("output");
 
-// Add a loading row to the table
-tableBody.innerHTML = `<tr><td colspan="2">Loading...</td></tr>`;
+const promises = [
+  new Promise((resolve) => {
+    const time = Math.floor(Math.random() * 3 + 1) * 1000;
+    setTimeout(() => resolve({ name: "Promise 1", time: time / 1000 }), time);
+  }),
+  new Promise((resolve) => {
+    const time = Math.floor(Math.random() * 3 + 1) * 1000;
+    setTimeout(() => resolve({ name: "Promise 2", time: time / 1000 }), time);
+  }),
+  new Promise((resolve) => {
+    const time = Math.floor(Math.random() * 3 + 1) * 1000;
+    setTimeout(() => resolve({ name: "Promise 3", time: time / 1000 }), time);
+  }),
+];
 
-// Fetch the data from the server
-fetch('https://myserver.com/data')
-  .then(response => response.json())
-  .then(data => {
-    // Remove the loading row from the table
-    tableBody.innerHTML = '';
-
-    // Loop through the data and populate the table rows
-    data.forEach(item => {
-      const row = document.createElement('tr');
-      row.innerHTML = `<td>${item.promiseName}</td><td>${item.timeTaken}</td>`;
-      tableBody.appendChild(row);
+async function callFns() {
+  const start = new Date();
+  // Use Promise.all to wait for all Promises to resolve
+  res.innerHTML += `
+            <tr id="loading">
+                <td colspan=2>Loading...</td>
+            </tr>
+          `;
+  await Promise.all(promises)
+    .then((results) => {
+      res.innerHTML = ``;
+      // Log the array of results
+      results.forEach((e) => {
+        res.innerHTML += `
+            <tr>
+                <td>${e.name}</td>
+                <td>${e.time}</td>
+            </tr>
+          `;
+      });
+    })
+    .catch((error) => {
+      console.error(error);
     });
-  })
-  .catch(error => {
-    console.error(error);
-    // Display an error message in the table
-    tableBody.innerHTML = `<tr><td colspan="2">An error occurred while fetching the data</td></tr>`;
-  });
+
+  const end = new Date();
+
+  const timeInMillis = end - start;
+  res.innerHTML += `
+            <tr>
+                <td>Total</td>
+                <td>${timeInMillis / 1000}</td>
+            </tr>
+          `;
+}
+
+callFns();
